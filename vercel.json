@@ -1,0 +1,30 @@
+{
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index.php",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.installmod.com"
+        }
+      ],
+      "destination": "https://installmod.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/app/:slug",
+      "destination": "/:slug",
+      "permanent": true
+    }
+  ]
+}
