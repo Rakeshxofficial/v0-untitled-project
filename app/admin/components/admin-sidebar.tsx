@@ -19,7 +19,6 @@ import {
   Menu,
   X,
   FileTextIcon as FileText2,
-  AlertTriangle,
 } from "lucide-react"
 
 export default function AdminSidebar() {
@@ -306,20 +305,6 @@ export default function AdminSidebar() {
               >
                 <Settings className="w-5 h-5 mr-3" />
                 <span>Settings</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/admin/error-logs"
-                className={`flex items-center p-2 rounded-lg ${
-                  isActive("/admin/error-logs")
-                    ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <AlertTriangle className="w-5 h-5 mr-3" />
-                <span>Error Logs</span>
               </Link>
             </li>
           </ul>

@@ -8,7 +8,6 @@ import CanonicalTag from "@/app/components/canonical-tag"
 import { ToastProvider } from "@/components/ui/use-toast"
 // Add Script import
 import Script from "next/script"
-import ClientErrorHandler from "@/components/client-error-handler"
 import { generateWebsiteSchema, generateOrganizationSchema, SchemaMarkupScript } from "@/app/components/schema-markup"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -109,12 +108,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
 
-        {/* Add Google AdSense */}
+        {/* Add Google AdSense - Only on non-admin pages */}
         <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4858972826245644"
-          crossOrigin="anonymous"
-        ></script>
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                // Check if the current path is not in the admin section
+                if (!window.location.pathname.startsWith('/admin')) {
+                  const adsenseScript = document.createElement('script');
+                  adsenseScript.async = true;
+                  adsenseScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4858972826245644";
+                  adsenseScript.crossOrigin = "anonymous";
+                  document.head.appendChild(adsenseScript);
+                }
+              })();
+            `,
+          }}
+        />
 
         {/* Add a script to disable Next.js client-side navigation */}
         <script
@@ -180,7 +190,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ClientErrorHandler />
           <Header />
           <ToastProvider>{children}</ToastProvider>
         </ThemeProvider>
