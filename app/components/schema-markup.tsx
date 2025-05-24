@@ -208,6 +208,56 @@ export function generateBreadcrumbSchema(breadcrumbs: { name: string; url: strin
   }
 }
 
+// Function to generate app schema markup for metadata
+export function generateAppSchemaMarkup({
+  app,
+  faqs,
+  breadcrumbs,
+}: {
+  app: {
+    title: string
+    description: string
+    icon_url: string
+    slug: string
+    category: { name: string }
+    version: string
+    updated_at: string
+    publisher: string
+    requirements?: string
+    size?: string
+  }
+  faqs: { question: string; answer: string }[]
+  breadcrumbs: { name: string; url: string }[]
+}) {
+  const canonicalUrl = getCanonicalUrl(`/${app.slug}`)
+  const iconUrl = app.icon_url || "/placeholder.svg"
+
+  // Generate SoftwareApplication schema
+  const softwareAppSchema = generateSoftwareApplicationSchema({
+    name: app.title,
+    description: app.description.replace(/<[^>]*>/g, "").substring(0, 500) + "...",
+    image: iconUrl,
+    url: canonicalUrl,
+    applicationCategory: app.category?.name || "Application",
+    version: app.version,
+    datePublished: new Date(app.updated_at).toISOString(),
+    publisher: app.publisher || "InstallMOD",
+    aggregateRating: {
+      ratingValue: "4.5", // Default rating
+      ratingCount: "100", // Default count
+    },
+  })
+
+  // Generate FAQPage schema
+  const faqSchema = generateFAQSchema(faqs)
+
+  // Generate BreadcrumbList schema
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs)
+
+  // Combine all schemas
+  return [softwareAppSchema, faqSchema, breadcrumbSchema]
+}
+
 // Schema component for app/game details page
 export function AppSchemaMarkup({
   app,
