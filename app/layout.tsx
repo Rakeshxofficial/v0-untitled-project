@@ -4,24 +4,26 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import Header from "@/components/Header"
 import { ThemeProvider } from "@/components/theme-provider"
-import CanonicalTag from "@/app/components/canonical-tag"
+// Removed CanonicalTag import
 import { ToastProvider } from "@/components/ui/use-toast"
-// Add Script import
 import Script from "next/script"
 import { generateWebsiteSchema, generateOrganizationSchema, SchemaMarkupScript } from "@/app/components/schema-markup"
 
 const inter = Inter({ subsets: ["latin"] })
 
-// Google Analytics Tracking ID
 const GA_TRACKING_ID = "G-E8RZ8Z3S1Y"
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://installmod.com"), // Ensures relative canonicals resolve correctly
   title: {
     default: "InstallMOD - Download & Enjoy Modded APKs",
     template: "%s",
   },
   description:
     "Download the latest modded APKs for Android games and apps with premium features unlocked, no ads, and enhanced functionality.",
+  alternates: {
+    canonical: "/", // Sets the canonical URL for the homepage to https://installmod.com/
+  },
   icons: {
     icon: [
       {
@@ -47,7 +49,6 @@ export const metadata: Metadata = {
       type: "image/png",
     },
   },
-  // Add default robots metadata
   robots: {
     index: true,
     follow: true,
@@ -71,7 +72,6 @@ export const viewport = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Generate base schema for the entire site
   const baseSchema = [
     generateWebsiteSchema({
       name: "InstallMOD",
@@ -82,38 +82,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     generateOrganizationSchema({
       name: "InstallMOD",
       url: "https://installmod.com",
-      logo: "https://installmod.com/logo.png", // Update with actual logo URL
+      logo: "https://installmod.com/logo.png",
       description: "InstallMOD provides modded APKs for Android games and apps with premium features unlocked.",
-      sameAs: ["https://twitter.com/installmod", "https://facebook.com/installmod", "https://t.me/installmod"], // Update with actual social media URLs
+      sameAs: ["https://twitter.com/installmod", "https://facebook.com/installmod", "https://t.me/installmod"],
     }),
   ]
 
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        {/* Add the canonical tag component */}
-        <CanonicalTag />
-
-        {/* Base Schema Markup - using the new component */}
+        {/* CanonicalTag component removed, handled by metadata object */}
         <SchemaMarkupScript schemas={baseSchema} />
-
-        {/* Update the additional favicon for older browsers */}
         <link rel="icon" type="image/x-icon" href="https://locationlive.in/installMOD/favicons/favicon_32x32.png" />
-
-        {/* Add Google Fonts for premium typography */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-
-        {/* Add Google AdSense - Only on non-admin pages */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                // Check if the current path is not in the admin section
                 if (!window.location.pathname.startsWith('/admin')) {
                   const adsenseScript = document.createElement('script');
                   adsenseScript.async = true;
@@ -125,60 +115,52 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
-
-        {/* Add a script to disable Next.js client-side navigation */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-    // Disable Next.js client-side navigation
-    window.__NEXT_DATA__ = window.__NEXT_DATA__ || {};
-    window.__NEXT_DATA__.props = window.__NEXT_DATA__.props || {};
-    window.__NEXT_DATA__.props.pageProps = window.__NEXT_DATA__.props.pageProps || {};
-    window.__NEXT_DATA__.props.pageProps.__N_SSG = false;
-    
-    // Override Next.js router to force full page loads
-    if (window.next && window.next.router) {
-      window.next.router.push = function(url) { window.location.href = url; };
-      window.next.router.replace = function(url) { window.location.href = url; };
-    }
-    
-    // Disable prefetching
-    document.addEventListener('DOMContentLoaded', function() {
-      const links = document.querySelectorAll('a[href^="/"]');
-      links.forEach(link => {
-        link.setAttribute('data-no-prefetch', 'true');
-      });
-    });
-    `,
+        // Disable Next.js client-side navigation
+        window.__NEXT_DATA__ = window.__NEXT_DATA__ || {};
+        window.__NEXT_DATA__.props = window.__NEXT_DATA__.props || {};
+        window.__NEXT_DATA__.props.pageProps = window.__NEXT_DATA__.props.pageProps || {};
+        window.__NEXT_DATA__.props.pageProps.__N_SSG = false;
+        
+        // Override Next.js router to force full page loads
+        if (window.next && window.next.router) {
+          window.next.router.push = function(url) { window.location.href = url; };
+          window.next.router.replace = function(url) { window.location.href = url; };
+        }
+        
+        // Disable prefetching
+        document.addEventListener('DOMContentLoaded', function() {
+          const links = document.querySelectorAll('a[href^="/"]');
+          links.forEach(link => {
+            link.setAttribute('data-no-prefetch', 'true');
+          });
+        });
+        `,
           }}
         />
         <script
           dangerouslySetInnerHTML={{
             __html: `
-    // Force full page reloads for all internal links
-    document.addEventListener('click', function(e) {
-      // Find the closest anchor tag
-      let target = e.target;
-      while (target && target.tagName !== 'A') {
-        target = target.parentNode;
-        if (!target) return;
-      }
-      
-      // Check if it's an internal link
-      if (target.href && target.href.startsWith(window.location.origin)) {
-        // Prevent default behavior
-        e.preventDefault();
-        
-        // Navigate with a full page reload
-        window.location.href = target.href;
-      }
-    }, true);
-    `,
+        // Force full page reloads for all internal links
+        document.addEventListener('click', function(e) {
+          let target = e.target;
+          while (target && target.tagName !== 'A') {
+            target = target.parentNode;
+            if (!target) return;
+          }
+          
+          if (target.href && target.href.startsWith(window.location.origin)) {
+            e.preventDefault();
+            window.location.href = target.href;
+          }
+        }, true);
+        `,
           }}
         />
       </head>
       <body className={inter.className}>
-        {/* Google Analytics Script - added at the top of the body for better performance */}
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`} strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
@@ -188,7 +170,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             gtag('config', '${GA_TRACKING_ID}');
           `}
         </Script>
-
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
           <ToastProvider>{children}</ToastProvider>
