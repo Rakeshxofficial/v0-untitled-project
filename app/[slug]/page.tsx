@@ -36,15 +36,15 @@ async function checkBlogExists(slug: string) {
   return { exists: !!blogData, type: "blog" }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
 
   // Check if it's an app/game
   const appResult = await checkAppExists(slug)
   if (appResult.exists) {
     // Import and use the app metadata generator
     const { generateMetadata: appMetadataGenerator } = await import("../app/[slug]/page")
-    return appMetadataGenerator({ params })
+    return appMetadataGenerator({ params: Promise.resolve({ slug }) })
   }
 
   // Check if it's a blog
@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (blogResult.exists) {
     // Import and use the blog metadata generator
     const { generateMetadata: blogMetadataGenerator } = await import("../blog/[slug]/page")
-    return blogMetadataGenerator({ params })
+    return blogMetadataGenerator({ params: Promise.resolve({ slug }) })
   }
 
   // Default metadata if not found
@@ -62,8 +62,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function ContentPage({ params }: { params: { slug: string } }) {
-  const { slug } = params
+export default async function ContentPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
 
   // Check if it's an app/game
   const appResult = await checkAppExists(slug)

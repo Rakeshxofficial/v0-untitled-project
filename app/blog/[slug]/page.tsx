@@ -14,9 +14,10 @@ import { getCanonicalUrl } from "@/lib/canonical-url"
 // Import the schema markup component at the top of the file
 import { BlogSchemaMarkup } from "@/app/components/schema-markup"
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const resolvedParams = await params
   // Use the supabase instance directly
-  const { data: blog } = await supabase.from("blogs").select("*").eq("slug", params.slug).single()
+  const { data: blog } = await supabase.from("blogs").select("*").eq("slug", resolvedParams.slug).single()
 
   if (!blog) {
     return {
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 
   // Generate the canonical URL for this blog - now without the /blog/ prefix
-  const canonicalUrl = getCanonicalUrl(`/${params.slug}`)
+  const canonicalUrl = getCanonicalUrl(`/${resolvedParams.slug}`)
 
   return {
     title: blog.meta_title || blog.title,
@@ -62,12 +63,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 // Rest of the component remains the same
-export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
+export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params
   // Use the supabase instance directly
   const { data: blog, error } = await supabase
     .from("blogs")
     .select(`*, category:categories(name, slug), tags:blog_tags(tags:tags(id, name, slug))`)
-    .eq("slug", params.slug)
+    .eq("slug", resolvedParams.slug)
     .eq("status", "published")
     .single()
 
@@ -113,7 +115,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
 
   // Get the full URL for sharing
   const siteUrl = "https://installmod.com"
-  const fullUrl = `${siteUrl}/${params.slug}`
+  const fullUrl = `${siteUrl}/${resolvedParams.slug}`
 
   // Inside the BlogDetailPage component, before the return statement, add this code to prepare breadcrumb data
   // Add this after fetching related posts and before the return statement
@@ -124,7 +126,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
       name: transformedBlog.category?.name || "Category",
       url: `https://installmod.com/blogs/category/${transformedBlog.category?.slug || ""}`,
     },
-    { name: transformedBlog.title, url: `https://installmod.com/${params.slug}` },
+    { name: transformedBlog.title, url: `https://installmod.com/${resolvedParams.slug}` },
   ]
 
   // In the return statement, add the schema markup component right after the opening div
@@ -235,7 +237,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
           {/* Social Share Buttons */}
           <div className="flex justify-end mb-8">
             <ShareButtons
-              url={`/blog/${params.slug}`}
+              url={`/blog/${resolvedParams.slug}`}
               title={transformedBlog.title}
               description={transformedBlog.excerpt}
             />

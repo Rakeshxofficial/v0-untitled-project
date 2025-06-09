@@ -13,12 +13,12 @@ import { getPublicUrl } from "@/lib/utils"
 import { getCanonicalUrl } from "@/lib/canonical-url"
 import { extractHeadingsFromHtml, addIdsToHeadings } from "@/app/utils/html-utils"
 import type { Metadata } from "next"
-import { AppSchemaMarkup } from "@/app/components/schema-markup"
+import { generateAppSchemaMarkup } from "@/app/components/schema-markup"
 import AppInfoGrid from "@/app/components/app-info-grid"
 
 // Modify the generateMetadata function to include favicon handling
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
 
   // Generate the canonical URL for this app - now without the /app/ prefix
   const canonicalUrl = getCanonicalUrl(`/${slug}`)
@@ -275,8 +275,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 // Rest of the component remains the same
-export default async function AppDetailsPage({ params }: { params: { slug: string } }) {
-  const { slug } = params
+export default async function AppDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
 
   // First try to find the app
   const { data: appData, error: appError } = await supabase
@@ -443,13 +443,13 @@ export default async function AppDetailsPage({ params }: { params: { slug: strin
     { name: contentData.title, url: `https://${contentData.slug}.installmod.com` },
   ]
 
+  // Generate schema markup for the head section
+  const schemaMarkup = generateAppSchemaMarkup(contentData, faqData, breadcrumbData)
+
   // In the return statement, add the schema markup component right after the opening div
   // Add this right after the first div in the return statement
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Schema Markup */}
-      <AppSchemaMarkup app={contentData} faqs={faqData} breadcrumbs={breadcrumbData} />
-
       <main className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content - 2/3 width on desktop */}

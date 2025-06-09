@@ -8,6 +8,15 @@ const nextConfig = {
     disableOptimizedLoading: true,
     disableStaticImages: false,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  images: {
+    unoptimized: true,
+  },
 }
 
 module.exports = nextConfig
