@@ -16,15 +16,6 @@ const nextConfig = {
         hostname: '**',
       },
     ],
-    unoptimized: true,
-  },
-  
-  // Added build error handling configurations
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
   },
 }
 
