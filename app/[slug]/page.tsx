@@ -37,14 +37,6 @@ async function checkBlogExists(slug: string) {
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  // Add null check for params
-  if (!params || !params.slug) {
-    return {
-      title: "Content Not Found - InstallMOD",
-      description: "The requested content could not be found.",
-    }
-  }
-
   const { slug } = params
 
   // Check if it's an app/game
@@ -71,11 +63,6 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function ContentPage({ params }: { params: { slug: string } }) {
-  // Add null check for params
-  if (!params || !params.slug) {
-    notFound()
-  }
-
   const { slug } = params
 
   // Check if it's an app/game
@@ -98,55 +85,41 @@ export default async function ContentPage({ params }: { params: { slug: string }
 
 // Generate static paths for common content to improve performance
 export async function generateStaticParams() {
-  try {
-    // Fetch popular apps
-    const { data: popularApps } = await supabase
-      .from("apps")
-      .select("slug")
-      .eq("status", "published")
-      .not("slug", "is", null)
-      .order("download_count", { ascending: false })
-      .limit(20)
+  // Fetch popular apps
+  const { data: popularApps } = await supabase
+    .from("apps")
+    .select("slug")
+    .eq("status", "published")
+    .order("download_count", { ascending: false })
+    .limit(20)
 
-    // Fetch popular games
-    const { data: popularGames } = await supabase
-      .from("games")
-      .select("slug")
-      .eq("status", "published")
-      .not("slug", "is", null)
-      .order("download_count", { ascending: false })
-      .limit(20)
+  // Fetch popular games
+  const { data: popularGames } = await supabase
+    .from("games")
+    .select("slug")
+    .eq("status", "published")
+    .order("download_count", { ascending: false })
+    .limit(20)
 
-    // Fetch popular blogs
-    const { data: popularBlogs } = await supabase
-      .from("blogs")
-      .select("slug")
-      .eq("status", "published")
-      .not("slug", "is", null)
-      .order("view_count", { ascending: false })
-      .limit(20)
+  // Fetch popular blogs
+  const { data: popularBlogs } = await supabase
+    .from("blogs")
+    .select("slug")
+    .eq("status", "published")
+    .order("view_count", { ascending: false })
+    .limit(20)
 
-    const appParams = (popularApps || [])
-      .filter((app) => app.slug)
-      .map((app) => ({
-        slug: app.slug,
-      }))
+  const appParams = (popularApps || []).map((app) => ({
+    slug: app.slug,
+  }))
 
-    const gameParams = (popularGames || [])
-      .filter((game) => game.slug)
-      .map((game) => ({
-        slug: game.slug,
-      }))
+  const gameParams = (popularGames || []).map((game) => ({
+    slug: game.slug,
+  }))
 
-    const blogParams = (popularBlogs || [])
-      .filter((blog) => blog.slug)
-      .map((blog) => ({
-        slug: blog.slug,
-      }))
+  const blogParams = (popularBlogs || []).map((blog) => ({
+    slug: blog.slug,
+  }))
 
-    return [...appParams, ...gameParams, ...blogParams]
-  } catch (error) {
-    console.error("Error generating static params:", error)
-    return []
-  }
+  return [...appParams, ...gameParams, ...blogParams]
 }
