@@ -36,7 +36,7 @@ const RESERVED_SUBDOMAINS = [
 ]
 
 // Special paths that should not be treated as app slugs
-const RESERVED_PATHS = ["robots.txt", "sitemap.xml", "favicon.ico", "ads.txt"]
+const RESERVED_PATHS = ["robots.txt", "sitemap.xml", "favicon.ico"]
 
 // Blog post URL patterns
 const BLOG_POST_PATTERNS = [
