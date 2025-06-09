@@ -13,7 +13,7 @@ import { getPublicUrl } from "@/lib/utils"
 import { getCanonicalUrl } from "@/lib/canonical-url"
 import { extractHeadingsFromHtml, addIdsToHeadings } from "@/app/utils/html-utils"
 import type { Metadata } from "next"
-import { AppSchemaMarkup } from "@/app/components/schema-markup"
+import { generateAppSchemaMarkup } from "@/app/components/schema-markup"
 import AppInfoGrid from "@/app/components/app-info-grid"
 
 // Modify the generateMetadata function to include favicon handling
@@ -443,13 +443,13 @@ export default async function AppDetailsPage({ params }: { params: { slug: strin
     { name: contentData.title, url: `https://${contentData.slug}.installmod.com` },
   ]
 
+  // Generate schema markup for the head section
+  const schemaMarkup = generateAppSchemaMarkup(contentData, faqData, breadcrumbData)
+
   // In the return statement, add the schema markup component right after the opening div
   // Add this right after the first div in the return statement
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Schema Markup */}
-      <AppSchemaMarkup app={contentData} faqs={faqData} breadcrumbs={breadcrumbData} />
-
       <main className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content - 2/3 width on desktop */}
